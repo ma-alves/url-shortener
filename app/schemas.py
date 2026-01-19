@@ -11,10 +11,6 @@ class UrlIn(BaseModel):
     long_url: HttpUrl
 
 
-class Url(UrlIn):
+class UrlOut(UrlIn):
     short_code: str
     created_at: datetime
-
-
-class ShortCodeOut(BaseModel):
-    short_code: str

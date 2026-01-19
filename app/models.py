@@ -1,17 +1,16 @@
 from datetime import datetime
 
 from sqlalchemy.orm import (
-    DeclarativeBase,
+    declarative_base,
     Mapped,
     mapped_column,
 )
 
 
-class Base(DeclarativeBase):
-    pass
+Base = declarative_base()
 
 
-class Url:
+class Url(Base):
     __tablename__ = "urls"
 
     short_code: Mapped[str] = mapped_column(primary_key=True)
