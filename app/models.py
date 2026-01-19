@@ -6,8 +6,7 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-
-Base = declarative_base()
+from database import Base
 
 
 class Url(Base):

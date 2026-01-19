@@ -4,13 +4,14 @@ from typing import Annotated
 
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import RedirectResponse
+from pydantic import HttpUrl
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from base62 import generate_short_code
 from database import get_session, sessionmanager
 from models import Url
-from schemas import Message, UrlIn, UrlOut
+from schemas import Message, UrlOut
 
 
 @asynccontextmanager
@@ -31,20 +32,25 @@ async def index():
 
 
 @app.post("/shorten", response_model=UrlOut, status_code=HTTPStatus.CREATED)
-async def shorten(url: UrlIn, session: Session):
-    short_url_code = Url(
+async def shorten(url: HttpUrl, session: Session):
+    existing_url = await session.scalar(select(Url).where(Url.long_url == str(url)))
+    
+    if existing_url:
+        return existing_url
+
+    short_url_object = Url(
         short_code=generate_short_code(),
-        long_url=url,
+        long_url=str(url),
     )
 
-    session.add(short_url_code)
+    session.add(short_url_object)
     await session.commit()
-    await session.refresh(short_url_code)
+    await session.refresh(short_url_object)
 
-    return short_url_code
+    return short_url_object
 
 
-@app.get("/{short_code}")
+@app.get("/{short_code}", status_code=HTTPStatus.MOVED_PERMANENTLY)
 async def get_url(short_code: str, session: Session):
     url_db = await session.scalar(select(Url).where(Url.short_code == short_code))
 
