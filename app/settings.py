@@ -6,3 +6,9 @@ class Settings(BaseSettings):
 
     database_url: str
     secret_key: str
+    postgres_db: str
+    postgres_user: str
+    postgres_password: str
+    redis_host: str
+    redis_port: int
+    redis_db: int

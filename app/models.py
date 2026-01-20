@@ -1,12 +1,11 @@
 from datetime import datetime
 
 from sqlalchemy.orm import (
-    declarative_base,
     Mapped,
     mapped_column,
 )
 
-from database import Base
+from .database import Base
 
 
 class Url(Base):

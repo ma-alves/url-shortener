@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from http import HTTPStatus
+import json
 from typing import Annotated
 
 from fastapi import FastAPI, Depends, HTTPException
@@ -8,10 +9,11 @@ from pydantic import HttpUrl
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from base62 import generate_short_code
-from database import get_session, sessionmanager
-from models import Url
-from schemas import Message, UrlOut
+from .base62 import generate_short_code
+from .cache import get_cached_code, set_cached_data
+from .database import get_session, sessionmanager
+from .models import Url
+from .schemas import Message, UrlOut
 
 
 @asynccontextmanager
@@ -50,11 +52,19 @@ async def shorten(url: HttpUrl, session: Session):
     return short_url_object
 
 
-@app.get("/{short_code}", status_code=HTTPStatus.MOVED_PERMANENTLY)
+@app.get("/{short_code}")
 async def get_url(short_code: str, session: Session):
+    cached_data = get_cached_code(short_code)
+    
+    if cached_data:
+        cached_short_code = str(cached_data)
+        return RedirectResponse(cached_short_code, HTTPStatus.MOVED_PERMANENTLY)
+    
     url_db = await session.scalar(select(Url).where(Url.short_code == short_code))
 
     if not url_db:
         raise HTTPException(HTTPStatus.NOT_FOUND, detail='URL não encontrada.')
 
+    set_cached_data(url_db.short_code, url_db.long_url)
+    
     return RedirectResponse(url_db.long_url, HTTPStatus.MOVED_PERMANENTLY)
