@@ -576,6 +576,14 @@ wheels = [
 ]
 
 [[package]]
+name = "pybase62"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/11/07/8fe498201daece90af1725cf48d5de9d1a87ea8d457df52c986ef926ff33/pybase62-1.0.0-py3-none-any.whl", hash = "sha256:60539ad956ec9e9de091bc7ae88c9550bc2fa17f503050cf34d021b75e73cb27", size = 4913, upload-time = "2023-05-29T08:43:05.677Z" },
+]
+
+[[package]]
 name = "pydantic"
 version = "2.12.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1022,6 +1030,7 @@ dependencies = [
     { name = "asyncpg" },
     { name = "dotenv" },
     { name = "fastapi", extra = ["standard"] },
+    { name = "pybase62" },
     { name = "redis", extra = ["hiredis"] },
     { name = "ruff" },
     { name = "sqlalchemy", extra = ["asyncio"] },
@@ -1034,6 +1043,7 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.31.0" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.128.0" },
+    { name = "pybase62", specifier = ">=1.0.0" },
     { name = "redis", extras = ["hiredis"], specifier = ">=7.1.0" },
     { name = "ruff", specifier = ">=0.14.13" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.45" },

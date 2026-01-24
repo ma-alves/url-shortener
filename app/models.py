@@ -2,15 +2,22 @@ from datetime import datetime
 
 from sqlalchemy.orm import (
     Mapped,
+    mapped_as_dataclass,
     mapped_column,
+    registry,
 )
 
-from .database import Base
+from .database import async_engine
+
+table_registry = registry()
+table_registry.metadata.create_all(async_engine)
 
 
-class Url(Base):
+@mapped_as_dataclass(table_registry)
+class Url:
     __tablename__ = "urls"
 
-    short_code: Mapped[str] = mapped_column(primary_key=True)
-    long_url: Mapped[str]
+    uuid: Mapped[str] = mapped_column(unique=True, primary_key=True)
+    long_url: Mapped[str] = mapped_column(unique=True)
+    short_code: Mapped[str] = mapped_column(unique=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())

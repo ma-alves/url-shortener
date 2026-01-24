@@ -12,7 +12,7 @@ redis_client = redis.Redis(
     decode_responses=True,
     host=Settings().redis_host,
     port=Settings().redis_port,
-    db=Settings().redis_db
+    db=Settings().redis_db,
 )
 
 

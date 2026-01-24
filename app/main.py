@@ -1,7 +1,6 @@
-from contextlib import asynccontextmanager
 from http import HTTPStatus
-import json
 from typing import Annotated
+from uuid import uuid4
 
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import RedirectResponse
@@ -9,21 +8,14 @@ from pydantic import HttpUrl
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .base62 import generate_short_code
+from .utils import generate_short_code
 from .cache import get_cached_code, set_cached_data
-from .database import get_session, sessionmanager
+from .database import get_session
 from .models import Url
 from .schemas import Message, UrlOut
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    yield
-    if sessionmanager._engine is not None:
-        await sessionmanager.close()
-
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 Session = Annotated[AsyncSession, Depends(get_session)]
 
@@ -36,13 +28,14 @@ async def index():
 @app.post("/shorten", response_model=UrlOut, status_code=HTTPStatus.CREATED)
 async def shorten(url: HttpUrl, session: Session):
     existing_url = await session.scalar(select(Url).where(Url.long_url == str(url)))
-    
+
     if existing_url:
         return existing_url
 
     short_url_object = Url(
-        short_code=generate_short_code(),
+        uuid=str(uuid4()),
         long_url=str(url),
+        short_code=generate_short_code(),
     )
 
     session.add(short_url_object)
@@ -55,16 +48,16 @@ async def shorten(url: HttpUrl, session: Session):
 @app.get("/{short_code}")
 async def get_url(short_code: str, session: Session):
     cached_data = get_cached_code(short_code)
-    
+
     if cached_data:
         cached_short_code = str(cached_data)
-        return RedirectResponse(cached_short_code, HTTPStatus.MOVED_PERMANENTLY)
-    
+        return RedirectResponse(cached_short_code, HTTPStatus.FOUND)
+
     url_db = await session.scalar(select(Url).where(Url.short_code == short_code))
 
     if not url_db:
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail='URL não encontrada.')
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail="URL não encontrada.")
 
     set_cached_data(url_db.short_code, url_db.long_url)
-    
-    return RedirectResponse(url_db.long_url, HTTPStatus.MOVED_PERMANENTLY)
+
+    return RedirectResponse(url_db.long_url, HTTPStatus.FOUND)
