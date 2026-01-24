@@ -7,10 +7,8 @@ from sqlalchemy.orm import (
     registry,
 )
 
-from .database import async_engine
 
 table_registry = registry()
-table_registry.metadata.create_all(async_engine)
 
 
 @mapped_as_dataclass(table_registry)
