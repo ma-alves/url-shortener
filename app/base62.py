@@ -1,5 +1,5 @@
-import string
 import random
+import string
 
 base62_chars = string.digits + string.ascii_letters
 
@@ -10,7 +10,8 @@ def generate_short_code():
 
 
 # Alternativa para criação do short code
-# porém o int(uuid4()) é muito longo e pybase62 não encoda
+# porém o int(uuid4()) é muito longo e pybase62 não encoda,
+# o que impossibilita a proposta do bytebytego
 
 # import base62
 # import uuid

@@ -1,8 +1,9 @@
+import logging
+
 import redis
 from redis.cache import CacheConfig
 
 from .settings import Settings
-import logging
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, HttpUrl, UUID4
+from pydantic import UUID4, BaseModel, HttpUrl
 
 
 class Message(BaseModel):

@@ -2,18 +2,17 @@ from http import HTTPStatus
 from typing import Annotated
 from uuid import uuid4
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from pydantic import HttpUrl
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .utils import generate_short_code
+from .base62 import generate_short_code
 from .cache import get_cached_code, set_cached_data
 from .database import get_session
 from .models import Url
 from .schemas import Message, UrlOut
-
 
 app = FastAPI()
 
