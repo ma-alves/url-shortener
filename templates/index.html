@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encurtador de URLs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="w-full max-w-md">
+            <div class="bg-white py-8 px-6 border-2 border-black shadow-[3px_3px_0_0_#000] rounded-lg">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-black">Encurtador de URLs</h2>
+                    <p class="text-black mt-2">Cole sua URL longa e obtenha uma versão curta</p>
+                </div>
+                
+                <form id="urlForm" class="space-y-6">
+                    <div>
+                        <label for="url" class="block text-sm font-medium text-gray-800 mb-1">URL para encurtar</label>
+                        <input 
+                            type="url" 
+                            id="url" 
+                            name="url" 
+                            required
+                            placeholder="https://exemplo.com/sua-url-muito-longa"
+                            class="py-3 px-4 block w-full border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                        >
+                    </div>
+                    
+                    <button 
+                        type="submit" 
+                        class="w-full flex justify-center py-3 px-4 border-2 border-black shadow-[3px_3px_0_0_#000] rounded-full text-sm font-bold text-black bg-emerald-300 hover:bg-emerald-500 focus:shadow-[0px_0px_0_0_#000] focus:translate-y-1 focus:translate-x-1"
+                    >
+                        Encurtar URL
+                    </button>
+                </form>
+
+                <div id="result" class="mt-8 hidden">
+                    <div>
+                        <h2 class="text-black font-bold mb-3">URL encurtada com sucesso!</h2>
+                        <div class="border-2 border-black rounded p-4 mb-4">
+                            <p class="text-sm font-medium text-gray-800 mb-1">URL original:</p>
+                            <p id="originalUrl" class="text-black break-all"></p>
+                        </div>
+                        <div class="border-2 border-black rounded p-4">
+                            <p class="text-sm font-medium text-gray-800 mb-1">URL encurtada:</p>
+                            <div class="flex items-center gap-3">
+                                <p id="shortUrl" class="text-black font-medium flex-1 break-all"></p>
+                                <button 
+                                    onclick="copyToClipboard()" 
+                                    class="flex py-2 px-4 border-2 border-black shadow-[3px_3px_0_0_#000] rounded-full text-sm font-bold text-black bg-emerald-300 hover:bg-emerald-500 focus:shadow-[0px_0px_0_0_#000] focus:translate-y-1 focus:translate-x-1 whitespace-nowrap"
+                                >
+                                    Copiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="error" class="mt-8 hidden">
+                    <div class="border-2 border-black rounded-lg p-4">
+                        <p class="text-sm text-red-600 text-center" id="errorMessage"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('urlForm');
+        const resultDiv = document.getElementById('result');
+        const errorDiv = document.getElementById('error');
+        const originalUrlElement = document.getElementById('originalUrl');
+        const shortUrlElement = document.getElementById('shortUrl');
+        const errorMessageElement = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const urlInput = document.getElementById('url');
+            const url = urlInput.value;
+            
+            resultDiv.classList.add('hidden');
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch('/shorten', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao encurtar URL');
+                }
+
+                const data = await response.json();
+                const shortUrl = `${window.location.origin}/${data.short_code}`;
+                
+                originalUrlElement.textContent = data.long_url;
+                shortUrlElement.textContent = shortUrl;
+                
+                resultDiv.classList.remove('hidden');
+                
+            } catch (error) {
+                errorMessageElement.textContent = 'Erro ao encurtar a URL. Verifique se a URL é válida e tente novamente.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        function copyToClipboard() {
+            const shortUrl = shortUrlElement.textContent;
+            navigator.clipboard.writeText(shortUrl).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copiado!';
+                button.classList.remove('bg-emerald-300', 'hover:bg-emerald-500');
+                button.classList.add('bg-emerald-500');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('bg-emerald-500');
+                    button.classList.add('bg-emerald-300', 'hover:bg-emerald-500');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

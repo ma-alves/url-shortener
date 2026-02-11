@@ -4,7 +4,8 @@ from uuid import uuid4
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
-from pydantic import HttpUrl
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,28 +13,33 @@ from .base62 import generate_short_code
 from .cache import get_cached_code, set_cached_data
 from .database import get_session
 from .models import Url
-from .schemas import Message, UrlOut
+from .schemas import UrlOut
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 Session = Annotated[AsyncSession, Depends(get_session)]
 
 
-@app.get("/", response_model=Message, status_code=HTTPStatus.OK)
-async def index():
-    return {"message": "http://127.0.0.1:8000/docs#/"}
+@app.get("/", status_code=HTTPStatus.OK)
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post("/shorten", response_model=UrlOut, status_code=HTTPStatus.CREATED)
-async def shorten(url: HttpUrl, session: Session):
-    existing_url = await session.scalar(select(Url).where(Url.long_url == str(url)))
+async def shorten(data: dict, session: Session):
+    url = data.get("url")
+    if not url:
+        raise HTTPException(HTTPStatus.BAD_REQUEST, detail="URL é obrigatória")
+    
+    existing_url = await session.scalar(select(Url).where(Url.long_url == url))
 
     if existing_url:
         return existing_url
 
     short_url_object = Url(
         uuid=str(uuid4()),
-        long_url=str(url),
+        long_url=url,
         short_code=generate_short_code(),
     )
 

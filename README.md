@@ -1,6 +1,6 @@
 # URL Shortener
 
-Uma API escalável para encurtar URLs com cache distribuído, desenvolvida com FastAPI e arquitetura assíncrona para alto desempenho.
+Uma API para encurtar URLs com cache distribuído, desenvolvida com FastAPI e arquitetura assíncrona para alto desempenho.
 
 ## Tech Stack
 
@@ -66,8 +66,8 @@ docker compose down
 - **Método**: `POST`
 - **Rota**: `/shorten`
 - **Descrição**: Cria uma URL encurtada a partir de uma URL longa
-- **Parâmetros**:
-  - `url` (query, obrigatório): A URL a ser encurtada (formato HttpUrl)
+- **Request Body**:
+  - `url` (json, obrigatório): A URL a ser encurtada (formato `dict` por enquanto)
 - **Resposta (201)**:
   ```json
   {
