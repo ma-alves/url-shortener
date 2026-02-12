@@ -1,6 +1,6 @@
 # URL Shortener
 
-Uma API para encurtar URLs com cache distribuído, desenvolvida com FastAPI e arquitetura assíncrona para alto desempenho.
+API para encurtar URLs com cache, desenvolvida com FastAPI e arquitetura assíncrona para alto desempenho. Códigos de URL criados utilizando base 62 com range de 2 a 9 dígitos, possibilitando 62⁷ combinações de caracteres, valor mais do que suficiente para a escalabilidade do serviço. UI da API disponível em `/`para teste intuitivo dos endpoints.
 
 ## Tech Stack
 
@@ -8,8 +8,9 @@ Uma API para encurtar URLs com cache distribuído, desenvolvida com FastAPI e ar
 - **Banco de Dados**: PostgreSQL
 - **Cache**: Redis
 - **Container**: Docker Compose
-- **ORM/Query**: SQLAlchemy
+- **SQL Toolkit**: SQLAlchemy
 - **Testes**: Pytest
+- **Templating**: Jinja
 
 ## Instalação Local
 
@@ -34,12 +35,13 @@ Uma API para encurtar URLs com cache distribuído, desenvolvida com FastAPI e ar
    - Executar as migrações do banco de dados
    - Iniciar a aplicação na porta 8000
 
-4. **Verifique se a aplicação está rodando**
+<!-- 4. **Verifique se a aplicação está rodando**
    ```bash
    curl http://localhost:8000/
-   ```
+   ``` -->
 
-5. **Acesse a documentação interativa**
+4. **Acesse a UI e a documentação interativa**
+   - Index: `http://localhost:8000/`
    - Swagger UI: `http://localhost:8000/docs`
    - ReDoc: `http://localhost:8000/redoc`
 
@@ -51,18 +53,7 @@ docker compose down
 
 ## API Endpoints
 
-### 1. Página Inicial
-- **Método**: `GET`
-- **Rota**: `/`
-- **Descrição**: Retorna mensagem de boas-vindas com link para documentação
-- **Resposta (200)**:
-  ```json
-  {
-    "message": "http://127.0.0.1:8000/docs#/"
-  }
-  ```
-
-### 2. Encurtar URL
+### Encurtar URL
 - **Método**: `POST`
 - **Rota**: `/shorten`
 - **Descrição**: Cria uma URL encurtada a partir de uma URL longa
@@ -79,7 +70,7 @@ docker compose down
   ```
 - **Comportamento**: Se a URL já tiver sido encurtada anteriormente, retorna o código encurtado existente
 
-### 3. Redirecionar para URL Original
+### Redirecionar para URL Original
 - **Método**: `GET`
 - **Rota**: `/{short_code}`
 - **Descrição**: Redireciona para a URL original usando o código encurtado

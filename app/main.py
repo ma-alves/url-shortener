@@ -31,7 +31,7 @@ async def shorten(data: dict, session: Session):
     url = data.get("url")
     if not url:
         raise HTTPException(HTTPStatus.BAD_REQUEST, detail="URL é obrigatória")
-    
+
     existing_url = await session.scalar(select(Url).where(Url.long_url == url))
 
     if existing_url:
