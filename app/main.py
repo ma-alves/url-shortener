@@ -9,7 +9,7 @@ from fastapi.requests import Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .base62 import generate_short_code
+from .utils import generate_short_code
 from .cache import get_cached_code, set_cached_data
 from .database import get_session
 from .models import Url
@@ -36,11 +36,13 @@ async def shorten(data: dict, session: Session):
 
     if existing_url:
         return existing_url
+    
+    url_uuid = uuid4()
 
     short_url_object = Url(
-        uuid=str(uuid4()),
+        uuid=str(url_uuid),
         long_url=url,
-        short_code=generate_short_code(),
+        short_code=generate_short_code(url_uuid),
     )
 
     session.add(short_url_object)
@@ -64,5 +66,4 @@ async def get_url(short_code: str, session: Session):
         raise HTTPException(HTTPStatus.NOT_FOUND, detail="URL não encontrada.")
 
     set_cached_data(url_db.short_code, url_db.long_url)
-
     return RedirectResponse(url_db.long_url, HTTPStatus.FOUND)
