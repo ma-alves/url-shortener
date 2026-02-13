@@ -1,6 +1,6 @@
 # URL Shortener
 
-API para encurtar URLs com cache, desenvolvida com FastAPI e arquitetura assíncrona para alto desempenho. Códigos de URL criados utilizando base 62 com range de 2 a 9 dígitos, possibilitando 62⁷ combinações de caracteres, valor mais do que suficiente para a escalabilidade do serviço. UI da API disponível em `/`para teste intuitivo dos endpoints.
+API para encurtar URLs com cache, desenvolvida com FastAPI e arquitetura assíncrona para alto desempenho. Códigos de URL criados utilizando base 62 com range de 7 dígitos, possibilitando 62⁷ combinações de caracteres, valor mais do que suficiente para a escalabilidade do serviço. UI da API disponível em `/`para teste intuitivo dos endpoints.
 
 ## Tech Stack
 
@@ -64,7 +64,7 @@ docker compose down
   {
     "uuid": "550e8400-e29b-41d4-a716-446655440000",
     "long_url": "https://exemplo.com/pagina-muito-longa",
-    "short_code": "abc123",
+    "short_code": "abc1234",
     "created_at": "2026-01-29T10:30:00"
   }
   ```
